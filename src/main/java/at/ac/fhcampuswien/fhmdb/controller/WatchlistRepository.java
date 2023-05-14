@@ -25,6 +25,9 @@ public class WatchlistRepository {
         } catch (SQLException | NullPointerException | IllegalArgumentException e) {
             DatabaseException dbException = new DatabaseException("Failed to create a connection", e);
             ExceptionDialog.show(dbException);
+        } catch (Exception e) {
+            DatabaseException databaseException = new DatabaseException("Failed to create a connection", e);
+            ExceptionDialog.show(databaseException);
         }
     }
 
@@ -34,6 +37,9 @@ public class WatchlistRepository {
         } catch (SQLException | NullPointerException | IllegalArgumentException e) {
             DatabaseException dbException = new DatabaseException("Failed to create a connection", e);
             ExceptionDialog.show(dbException);
+        } catch (Exception e) {
+            DatabaseException databaseException = new DatabaseException("Failed to create a connection", e);
+            ExceptionDialog.show(databaseException);
         }
 
         return null;
@@ -47,6 +53,9 @@ public class WatchlistRepository {
         } catch (SQLException | NullPointerException | IllegalArgumentException e) {
             DatabaseException dbException = new DatabaseException("Failed to create a connection", e);
             ExceptionDialog.show(dbException);
+        } catch (Exception e) {
+            DatabaseException databaseException = new DatabaseException("Failed to create a connection", e);
+            ExceptionDialog.show(databaseException);
         }
     }
 }
