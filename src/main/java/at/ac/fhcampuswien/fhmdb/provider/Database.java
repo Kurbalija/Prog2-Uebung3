@@ -29,6 +29,9 @@ public class Database {
         } catch (SQLException | NullPointerException | IllegalArgumentException e) {
             DatabaseException dbException = new DatabaseException("Failed to create a database connection.", e);
             ExceptionDialog.show(dbException);
+        } catch (Exception e) {
+            DatabaseException databaseException = new DatabaseException("Failed to create a connection", e);
+            ExceptionDialog.show(databaseException);
         }
     }
 
@@ -43,6 +46,9 @@ public class Database {
         } catch (SQLException | NullPointerException | IllegalArgumentException e) {
             DatabaseException dbException = new DatabaseException("Failed to create tables in the database.", e);
             ExceptionDialog.show(dbException);
+        } catch (Exception e) {
+            DatabaseException databaseException = new DatabaseException("Failed to create a connection", e);
+            ExceptionDialog.show(databaseException);
         }
     }
 
