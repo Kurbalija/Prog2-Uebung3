@@ -1,5 +1,7 @@
 package at.ac.fhcampuswien.fhmdb.controller;
 
+import at.ac.fhcampuswien.fhmdb.exception.DatabaseException;
+import at.ac.fhcampuswien.fhmdb.exception.MovieAPIException;
 import at.ac.fhcampuswien.fhmdb.model.Genre;
 import at.ac.fhcampuswien.fhmdb.model.Movie;
 import at.ac.fhcampuswien.fhmdb.model.WatchlistEntity;
@@ -7,6 +9,7 @@ import at.ac.fhcampuswien.fhmdb.provider.Database;
 import at.ac.fhcampuswien.fhmdb.provider.movie.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.provider.movie.MovieProvider;
 import at.ac.fhcampuswien.fhmdb.event.ClickEventHandler;
+import at.ac.fhcampuswien.fhmdb.ui.ExceptionDialog;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -60,16 +63,26 @@ public class HomeController implements Initializable {
 
     public List<Movie> allMovies;
 
-    private final MovieProvider movieAPIProvider = (MovieProvider) new MovieAPI();
+    private final MovieProvider movieAPIProvider = new MovieAPI();
     private final ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
     private WatchlistRepository watchlistRepository;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // try {
         Database database = new Database();
         watchlistRepository = new WatchlistRepository(database.getWatchlistDao());
+        /*} catch (DatabaseException e) {
+            ExceptionDialog.show(e);
+            watchlistRepository = new WatchlistRepository();
+        }*/
 
-        allMovies = movieAPIProvider.getMovies();
+        try {
+            allMovies = movieAPIProvider.getMovies();
+        } catch (MovieAPIException e) {
+            ExceptionDialog.show(e);
+            allMovies = new ArrayList<>();
+        }
 
         observableMovies.addAll(allMovies);
 
@@ -91,7 +104,7 @@ public class HomeController implements Initializable {
         searchField.textProperty().addListener((observable, old, newVal) -> searchDebounce.playFromStart());
     }
 
-    void toggleSortOrder(ActionEvent actionEvent) {
+    private void toggleSortOrder(ActionEvent actionEvent) {
         if(sortBtn.getText().equals(ASCENDING)) {
             observableMovies.sort(Comparator.comparing(Movie::getTitle));
             sortBtn.setText(DESCENDING);
@@ -102,9 +115,14 @@ public class HomeController implements Initializable {
     }
 
     void searchAction(ActionEvent actionEvent) {
-        observableMovies.clear();
-        List<Movie> filteredMovies = movieAPIProvider.getMoviesWithQuery(constructQueryMap());
-        observableMovies.addAll(filteredMovies);
+        try {
+            observableMovies.clear();
+            List<Movie> filteredMovies = movieAPIProvider.getMoviesWithQuery(constructQueryMap());
+            observableMovies.addAll(filteredMovies);
+        } catch (MovieAPIException e) {
+            ExceptionDialog.show(e);
+            return;
+        }
 
         movieListView.refresh();
     }
@@ -126,6 +144,7 @@ public class HomeController implements Initializable {
 
         return queryMap;
     }
+
     public void resetAction(ActionEvent actionEvent) {
         observableMovies.clear();
         observableMovies.addAll(allMovies);
@@ -204,17 +223,32 @@ public class HomeController implements Initializable {
     private final ClickEventHandler<Movie> onAddToWatchlistClicked = (clickedItem) ->
     {
         WatchlistEntity watchlistEntity = new WatchlistEntity(clickedItem);
-        watchlistRepository.addToWatchlist(watchlistEntity);
+        try {
+            watchlistRepository.addToWatchlist(watchlistEntity);
+        } catch (DatabaseException e) {
+            ExceptionDialog.show(e);
+        }
     };
 
     private final ClickEventHandler<Movie> onRemoveFromWatchlistClicked = (clickedItem) -> {
         WatchlistEntity watchlistEntity = new WatchlistEntity(clickedItem);
-        watchlistRepository.removeFromWatchlist(watchlistEntity);
-        updateView();
+        try {
+            watchlistRepository.removeFromWatchlist(watchlistEntity);
+            updateView();
+        } catch (DatabaseException e) {
+            ExceptionDialog.show(e);
+        }
     };
 
     private void updateView() {
-        List<WatchlistEntity> repositoryList = watchlistRepository.getAll();
+        List<WatchlistEntity> repositoryList;
+        try {
+            repositoryList = watchlistRepository.getAll();
+        } catch (DatabaseException e) {
+            ExceptionDialog.show(e);
+            repositoryList = new ArrayList<>();
+        }
+
         List<Movie> watchlist = convertWatchlistEntitiesToMovies(repositoryList);
         observableMovies.clear();
         observableMovies.addAll(watchlist);
