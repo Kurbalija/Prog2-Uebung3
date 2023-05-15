@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class MovieTest {
     @Test
-    public void does_create() {
+    public void create_movie_does_not_return_exception() {
         assertDoesNotThrow(() -> {
             Movie mov = new Movie("1", "Test", new ArrayList<>(), 2021, "Test", "http://test.com",
                     120, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), 10.0);
