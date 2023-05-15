@@ -16,46 +16,42 @@ public class WatchlistRepository {
         this.dao = dao;
     }
 
-    public void removeFromWatchlist(WatchlistEntity movie) {
+    public WatchlistRepository(){
+        this.dao = null;
+    }
+
+    public void removeFromWatchlist(WatchlistEntity movie) throws DatabaseException{
         try {
             String apiId = movie.getApiId();
             DeleteBuilder<WatchlistEntity, Long> deleteBuilder = dao.deleteBuilder();
             deleteBuilder.where().eq("apiId", apiId);
             dao.delete(deleteBuilder.prepare());
         } catch (SQLException | NullPointerException | IllegalArgumentException e) {
-            DatabaseException dbException = new DatabaseException("Failed to create a connection", e);
-            ExceptionDialog.show(dbException);
+            throw new DatabaseException("Failed to remove entity from database.", e);
         } catch (Exception e) {
-            DatabaseException databaseException = new DatabaseException("Failed to create a connection", e);
-            ExceptionDialog.show(databaseException);
+            throw new DatabaseException("Failed to remove entity from database.", e);
         }
     }
 
-    public List<WatchlistEntity> getAll() {
+    public List<WatchlistEntity> getAll() throws DatabaseException {
         try {
             return dao.queryForAll();
         } catch (SQLException | NullPointerException | IllegalArgumentException e) {
-            DatabaseException dbException = new DatabaseException("Failed to create a connection", e);
-            ExceptionDialog.show(dbException);
+            throw new DatabaseException("Failed to fetch entities from database.", e);
         } catch (Exception e) {
-            DatabaseException databaseException = new DatabaseException("Failed to create a connection", e);
-            ExceptionDialog.show(databaseException);
+            throw new DatabaseException("Failed to fetch entities from database.", e);
         }
-
-        return null;
     }
 
-    public void addToWatchlist(WatchlistEntity movie) {
+    public void addToWatchlist(WatchlistEntity movie) throws DatabaseException{
         try {
             if(dao.queryForEq("apiId", movie.getApiId()).size() < 1) {
                 dao.create(movie);
             }
         } catch (SQLException | NullPointerException | IllegalArgumentException e) {
-            DatabaseException dbException = new DatabaseException("Failed to create a connection", e);
-            ExceptionDialog.show(dbException);
+            throw new DatabaseException("Failed to add entity from database.", e);
         } catch (Exception e) {
-            DatabaseException databaseException = new DatabaseException("Failed to create a connection", e);
-            ExceptionDialog.show(databaseException);
+            throw new DatabaseException("Failed to add entity from database.", e);
         }
     }
 }
