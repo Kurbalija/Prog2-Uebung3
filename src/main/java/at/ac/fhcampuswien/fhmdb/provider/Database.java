@@ -12,7 +12,7 @@ import com.j256.ormlite.table.TableUtils;
 import java.sql.SQLException;
 
 public class Database {
-    private final String DB_URL = "jdbc:h2:mem:fhmdb;DB_CLOSE_DELAY=-1"; // For in-memory database
+    private final String DB_URL = "jdbc:h2:./data/fhmdb;DB_CLOSE_DELAY=-1";
     private final String username = "";
     private final String password = "";
     private ConnectionSource connectionSource;
