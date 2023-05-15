@@ -4,7 +4,7 @@ import javafx.scene.control.Alert;
 
 public class ExceptionDialog
 {
-    public static void show(Exception e) {
+    public static void show(Exception e){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("An error occurred!");
         alert.setHeaderText(e.getMessage());

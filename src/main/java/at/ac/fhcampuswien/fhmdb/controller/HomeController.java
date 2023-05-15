@@ -71,10 +71,10 @@ public class HomeController implements Initializable {
 
         allMovies = movieAPIProvider.getMovies();
 
-        observableMovies.addAll(allMovies);
+        observableMovies.addAll(allMovies);         // add API data to observable list
 
         // initialize UI stuff
-        movieListView.setItems(observableMovies);
+        movieListView.setItems(observableMovies);   // set data of observable list to list view
         movieListView.setCellFactory(movieListView -> new MovieCell(onAddToWatchlistClicked, onRemoveFromWatchlistClicked));
 
         initializeGenreSelector();
@@ -109,7 +109,7 @@ public class HomeController implements Initializable {
         movieListView.refresh();
     }
 
-    private Map<String, String> constructQueryMap() {
+    private Map<String, String> constructQueryMap(){
         Map<String,String> queryMap = new HashMap<>();
 
         String searchQuery = searchField.getText().toLowerCase();
@@ -138,21 +138,21 @@ public class HomeController implements Initializable {
         movieListView.refresh();
     }
 
-    public void initializeGenreSelector() {
+    public void initializeGenreSelector(){
         genreComboBox.setPromptText("Filter by Genre");
-        genreComboBox.getItems().addAll(Genre.values());
+        genreComboBox.getItems().addAll( Genre.values() );
     }
 
-    public void initializeReleaseYearSelector() {
+    public void initializeReleaseYearSelector(){
         yearComboBox.setPromptText("Filter by Release Year");
-        int[] years = IntStream.range( 1970, Year.now().getValue() + 1 ).toArray();
-        yearComboBox.getItems().addAll(Arrays.stream(years).boxed().toList());
+        int[] years = IntStream.range( 1970, Year.now().getValue() + 1 ).toArray(); // generate years from 1970 to current year
+        yearComboBox.getItems().addAll( Arrays.stream(years).boxed().toList());
     }
 
-    public void initializeRatingSelector() {
+    public void initializeRatingSelector(){
         ratingComboBox.setPromptText("Filter by Rating");
-        double[] ratings = DoubleStream.iterate( 0.0, d -> d + 0.5 ).limit( 21 ).toArray();
-        ratingComboBox.getItems().addAll(Arrays.stream(ratings).boxed().toList());
+        double[] ratings = DoubleStream.iterate( 0.0, d -> d + 0.5 ).limit( 21 ).toArray(); // generate ratings from 0.0 to 10.0 in steps of 0.5
+        ratingComboBox.getItems().addAll( Arrays.stream(ratings).boxed().toList());
     }
 
     // returns the person who appears most often in the most often in the mainCast of the given movies.
@@ -188,11 +188,12 @@ public class HomeController implements Initializable {
                 .collect(Collectors.toList());
     }
 
-    private void toggleWatchlistMode( ActionEvent actionEvent ) {
-        if (watchlistBtn.getText().equals("Open watchlist")) {
+    //method to display the watchlist and the movies which are added to it
+    private void toggleWatchlistMode( ActionEvent actionEvent ){
+        if( watchlistBtn.getText().equals( "Open watchlist" ) ){
             hideTopBar();
             updateView();
-            watchlistBtn.setText("Close watchlist");
+            watchlistBtn.setText( "Close watchlist" );
         } else {
             showTopBar();
             observableMovies.clear();
@@ -201,31 +202,35 @@ public class HomeController implements Initializable {
         }
     }
 
+
+    // action used to add the selected film to the watchlist
     private final ClickEventHandler<Movie> onAddToWatchlistClicked = (clickedItem) ->
     {
         WatchlistEntity watchlistEntity = new WatchlistEntity(clickedItem);
         watchlistRepository.addToWatchlist(watchlistEntity);
     };
 
+
+    // action used to remove the selected film from the watchlist
     private final ClickEventHandler<Movie> onRemoveFromWatchlistClicked = (clickedItem) -> {
         WatchlistEntity watchlistEntity = new WatchlistEntity(clickedItem);
         watchlistRepository.removeFromWatchlist(watchlistEntity);
         updateView();
     };
 
-    private void updateView() {
+    private void updateView(){
         List<WatchlistEntity> repositoryList = watchlistRepository.getAll();
         List<Movie> watchlist = convertWatchlistEntitiesToMovies(repositoryList);
         observableMovies.clear();
         observableMovies.addAll(watchlist);
     }
 
-    private List<Movie> convertWatchlistEntitiesToMovies(List<WatchlistEntity> watchlistEntity) {
+    private List<Movie> convertWatchlistEntitiesToMovies(List<WatchlistEntity> watchlistEntity){
         List<Movie> movieList = new ArrayList<>();
 
-        if (watchlistEntity == null) return movieList;
+        if( watchlistEntity == null ) return movieList;
 
-        for (WatchlistEntity entity: watchlistEntity) {
+        for(WatchlistEntity entity : watchlistEntity){
             Movie movie = new Movie(
                     entity.getApiId(),
                     entity.getTitle(),
@@ -247,7 +252,8 @@ public class HomeController implements Initializable {
         return movieList;
     }
 
-    private void hideTopBar() {
+    // is used when the watchlist is displayed
+    private void hideTopBar(){
         sortBtn.setVisible(false);
         searchField.setVisible(false);
         genreComboBox.setVisible(false);
